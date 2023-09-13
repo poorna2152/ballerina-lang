@@ -4593,10 +4593,10 @@ public class FormattingTreeModifier extends TreeModifier {
             case MAPPING_CONSTRUCTOR:
                 MappingConstructorExpressionNode mappingConstructorExpressionNode =
                         (MappingConstructorExpressionNode) node;
-                return mappingConstructorExpressionNode.toSourceCode().trim().contains(System.lineSeparator());
+                return hasNonLeadingNLMinutiae(mappingConstructorExpressionNode);
             case LIST_CONSTRUCTOR:
                 ListConstructorExpressionNode listConstructorExpressionNode = (ListConstructorExpressionNode) node;
-                return listConstructorExpressionNode.toSourceCode().trim().contains(System.lineSeparator());
+                return hasNonLeadingNLMinutiae(listConstructorExpressionNode);
             default:
                 return false;
         }
@@ -4672,6 +4672,23 @@ public class FormattingTreeModifier extends TreeModifier {
             }
         }
         return false;
+    }
+
+    /**
+     * Check for new lines in the source code of the node excluding newlines belonging to leading minutiae.
+     *
+     * @param node The node
+     * @return <code>true</code> if a new line character is present. <code>false</code> otherwise
+     */
+    private boolean hasNonLeadingNLMinutiae(Node node) {
+        int count = node.toSourceCode().split(System.lineSeparator()).length - 1;
+        MinutiaeList minutiaeList = node.leadingMinutiae();
+        for (Minutiae minutiae : minutiaeList) {
+            if (minutiae.kind() == SyntaxKind.END_OF_LINE_MINUTIAE) {
+                count -= 1;
+            }
+        }
+        return count > 0;
     }
 
     private NodeList<ImportDeclarationNode> sortAndGroupImportDeclarationNodes(
