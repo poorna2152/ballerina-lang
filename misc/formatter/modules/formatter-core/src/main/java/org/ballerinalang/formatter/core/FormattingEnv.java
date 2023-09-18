@@ -85,4 +85,15 @@ public class FormattingEnv {
      * Reference to the next node that needs to be wrapped.
      */
     Node nodeToWrap = null;
+
+    /**
+     * Number of newline characters in the current node.
+     */
+    int newLinesInNode = 0;
+
+    /**
+     * Flag indicating whether a block node follows the current node.
+     */
+    boolean nextBlockPresent = false;
+
 }

@@ -1,16 +1,13 @@
 public function foo() {
     foreach string animal in animals {
         match
-    animal
-            {
-            "Mouse" =>
-            {
+    animal {
+            "Mouse" => {
             }
             "Dog"|"Canine" => {
             }
 
-            "Cat"|"Feline" =>
-            {
+            "Cat"|"Feline" => {
             }
             _ => {
             }
@@ -25,8 +22,7 @@ public function foo() {
     employee;
 
     if (true
-    )
-    {
+    ) {
     }
 
     error? flushResult =
@@ -53,8 +49,7 @@ public function foo() {
 }
 
 function foo(string
-|int id) returns int|error
-{
+|int id) returns int|error {
 }
 
 public function foo() {

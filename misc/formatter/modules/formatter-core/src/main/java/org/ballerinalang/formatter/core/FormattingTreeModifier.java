@@ -246,6 +246,7 @@ import io.ballerina.compiler.syntax.tree.XMLStartTagNode;
 import io.ballerina.compiler.syntax.tree.XMLStepExpressionNode;
 import io.ballerina.compiler.syntax.tree.XMLTextNode;
 import io.ballerina.tools.text.LineRange;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -310,6 +311,10 @@ public class FormattingTreeModifier extends TreeModifier {
             functionName = formatToken(functionDefinitionNode.functionName(), 1, 0);
         }
         NodeList<Node> relativeResourcePath = formatNodeList(functionDefinitionNode.relativeResourcePath(), 0, 0, 0, 0);
+        if (functionDefinitionNode.functionBody().kind() == SyntaxKind.FUNCTION_BODY_BLOCK) {
+            env.nextBlockPresent =
+                    !((FunctionBodyBlockNode) functionDefinitionNode.functionBody()).openBraceToken().isMissing();
+        }
         FunctionSignatureNode functionSignatureNode = formatNode(functionDefinitionNode.functionSignature(), 1, 0);
         FunctionBodyNode functionBodyNode =
                 formatNode(functionDefinitionNode.functionBody(), env.trailingWS, env.trailingNL);
@@ -374,12 +379,13 @@ public class FormattingTreeModifier extends TreeModifier {
         ReturnTypeDescriptorNode returnTypeDesc = null;
         if (functionSignatureNode.returnTypeDesc().isPresent()) {
             closePara = formatToken(functionSignatureNode.closeParenToken(), 1, 0);
+            setNewLinesInNode(functionSignatureNode.returnTypeDesc().get());
             returnTypeDesc =
                     formatNode(functionSignatureNode.returnTypeDesc().get(), env.trailingWS, env.trailingNL);
         } else {
+            setNewLinesInNode(functionSignatureNode.closeParenToken());
             closePara = formatToken(functionSignatureNode.closeParenToken(), env.trailingWS, env.trailingNL);
         }
-
         return functionSignatureNode.modify()
                 .withOpenParenToken(openPara)
                 .withParameters(parameters)
@@ -516,6 +522,7 @@ public class FormattingTreeModifier extends TreeModifier {
     public IfElseStatementNode transform(IfElseStatementNode ifElseStatementNode) {
         boolean prevPreservedNewLine = env.hasPreservedNewline;
         Token ifKeyword = formatToken(ifElseStatementNode.ifKeyword(), 1, 0);
+        setNewLinesInNode(ifElseStatementNode.condition(), ifElseStatementNode.ifBody().openBraceToken());
         ExpressionNode condition = formatNode(ifElseStatementNode.condition(), 1, 0);
         BlockStatementNode ifBody;
         Node elseBody = null;
@@ -891,6 +898,7 @@ public class FormattingTreeModifier extends TreeModifier {
     public WhileStatementNode transform(WhileStatementNode whileStatementNode) {
         boolean hasOnFailClause = whileStatementNode.onFailClause().isPresent();
         Token whileKeyword = formatToken(whileStatementNode.whileKeyword(), 1, 0);
+        setNewLinesInNode(whileStatementNode.condition(), whileStatementNode.whileBody().openBraceToken());
         ExpressionNode condition = formatNode(whileStatementNode.condition(), 1, 0);
         BlockStatementNode whileBody;
 
@@ -1544,6 +1552,7 @@ public class FormattingTreeModifier extends TreeModifier {
     public MatchStatementNode transform(MatchStatementNode matchStatementNode) {
         boolean hasOnFailClause = matchStatementNode.onFailClause().isPresent();
         Token matchKeyword = formatToken(matchStatementNode.matchKeyword(), 1, 0);
+        setNewLinesInNode(matchStatementNode.condition(), matchStatementNode.openBrace());
         ExpressionNode condition = formatNode(matchStatementNode.condition(), 1, 0);
         Token openBrace = formatToken(matchStatementNode.openBrace(), 0, 1);
         indent();
@@ -1574,6 +1583,7 @@ public class FormattingTreeModifier extends TreeModifier {
         SeparatedNodeList<Node> matchPatterns = formatSeparatedNodeList(matchClauseNode.matchPatterns(),
                 0, 0, 0, 0, 1, 0);
         MatchGuardNode matchGuard = formatNode(matchClauseNode.matchGuard().orElse(null), 1, 0);
+        setNewLinesInNode(matchClauseNode.rightDoubleArrow(), matchClauseNode.blockStatement().openBraceToken());
         Token rightDoubleArrow = formatToken(matchClauseNode.rightDoubleArrow(), 1, 0);
         BlockStatementNode blockStatement = formatNode(matchClauseNode.blockStatement(),
                 env.trailingWS, env.trailingNL);
@@ -4349,6 +4359,13 @@ public class FormattingTreeModifier extends TreeModifier {
         for (Minutiae minutiae : token.trailingMinutiae()) {
             switch (minutiae.kind()) {
                 case END_OF_LINE_MINUTIAE:
+                    if (env.newLinesInNode > 0) {
+                        env.newLinesInNode -= 1;
+                        if (env.newLinesInNode == 0) {
+                            env.nextBlockPresent = false;
+                            continue;
+                        }
+                    }
                     preserveIndentation(true);
                     removeTrailingWS(trailingMinutiae);
                     trailingMinutiae.add(getNewline());
@@ -4672,6 +4689,32 @@ public class FormattingTreeModifier extends TreeModifier {
             }
         }
         return false;
+    }
+
+    /**
+     * Sets the newLinesInNode variable to the number of new lines in the node if the next block node is present.
+     *
+     * @param node The current node
+     * @param nextNode The node following the current node
+     */
+    private void setNewLinesInNode(Node node, Node nextNode) {
+        env.nextBlockPresent = !nextNode.isMissing();
+        setNewLinesInNode(node);
+    }
+
+    private void setNewLinesInNode(Node node) {
+        if (!env.nextBlockPresent) {
+            return;
+        }
+        MinutiaeList minutiaeList = node.trailingMinutiae();
+        int size = minutiaeList.size();
+        for (int i = 0; i < size; i++) {
+            SyntaxKind kind = minutiaeList.get(i).kind();
+            if (kind != SyntaxKind.END_OF_LINE_MINUTIAE && kind != SyntaxKind.WHITESPACE_MINUTIAE) {
+                return;
+            }
+        }
+        env.newLinesInNode = StringUtils.countMatches(node.toSourceCode(), System.lineSeparator());
     }
 
     private NodeList<ImportDeclarationNode> sortAndGroupImportDeclarationNodes(
