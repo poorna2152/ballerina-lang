@@ -246,6 +246,7 @@ import io.ballerina.compiler.syntax.tree.XMLStartTagNode;
 import io.ballerina.compiler.syntax.tree.XMLStepExpressionNode;
 import io.ballerina.compiler.syntax.tree.XMLTextNode;
 import io.ballerina.tools.text.LineRange;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -4681,7 +4682,7 @@ public class FormattingTreeModifier extends TreeModifier {
      * @return <code>true</code> if a new line character is present. <code>false</code> otherwise
      */
     private boolean hasNonLeadingNLMinutiae(Node node) {
-        int count = node.toSourceCode().split(System.lineSeparator()).length - 1;
+        int count = StringUtils.countMatches(node.toSourceCode().trim(), System.lineSeparator());
         MinutiaeList minutiaeList = node.leadingMinutiae();
         for (Minutiae minutiae : minutiaeList) {
             if (minutiae.kind() == SyntaxKind.END_OF_LINE_MINUTIAE) {
