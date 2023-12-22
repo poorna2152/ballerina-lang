@@ -53,7 +53,7 @@ public function foo() {
 }
 
 function foo(string
-|int id) returns int|error
+        |int id) returns int|error
 {
 }
 
@@ -62,7 +62,7 @@ public function foo() {
     map<
     never> someMap = {};
     table<Person> key
-<never> personTable = table [
+    <never> personTable = table [
         {name: "John"}
     ];
 

@@ -4293,7 +4293,7 @@ public class FormattingTreeModifier extends TreeModifier {
         }
 
         // token.isMission() issue has to be discussed.
-        if (consecutiveNewlines > 0 && !env.preserveIndentation) {
+        if (consecutiveNewlines > 0 && (!env.preserveIndentation || (leadingMinutiae.size() == 0 && !token.isMissing()))) {
             addWhitespace(env.currentIndentation, leadingMinutiae);
         }
 
