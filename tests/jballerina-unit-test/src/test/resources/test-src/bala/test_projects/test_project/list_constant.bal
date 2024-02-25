@@ -1,4 +1,4 @@
-// Copyright (c) 2024, WSO2 LLC. (https://www.wso2.com).
+// Copyright (c) 2023, WSO2 LLC. (https://www.wso2.com).
 //
 // WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -27,6 +27,3 @@ public const IntArr l6 = [1, 2, 3];
 public const [int, string...] l7 = [1, "f", "g"];
 public const (string|int)[][] l8 = [[1, "2", 3], [4, 5, 6]];
 public const [(string[]|int[])...] l9 = [[1, 2, 3], ["4", "5", "6"]];
-const int[] l10 = [1, 2, 3];
-const [int, int, boolean] l11 = [1, 2, true];
-const l12 = l1;
