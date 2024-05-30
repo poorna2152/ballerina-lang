@@ -14595,7 +14595,8 @@ public class BallerinaParser extends AbstractParser {
         while (!isEndOfXMLStepExtend(nextToken.kind)) {
             if (nextToken.kind == SyntaxKind.DOT_TOKEN) {
                 STNode dotToken = parseDotToken();
-                STNode funcCallExpression = parseFuncCall(parseIdentifier(ParserRuleContext.IDENTIFIER));
+                STNode funcCallExpression = parseFuncCall(
+                        STNodeFactory.createSimpleNameReferenceNode(parseIdentifier(ParserRuleContext.IDENTIFIER)));
                 stepExtension = STNodeFactory.createXMLStepMethodCallExtendNode(dotToken, funcCallExpression);
             } else if (nextToken.kind == SyntaxKind.DOT_LT_TOKEN) {
                 stepExtension = parseXMLFilterExpressionRhs();
