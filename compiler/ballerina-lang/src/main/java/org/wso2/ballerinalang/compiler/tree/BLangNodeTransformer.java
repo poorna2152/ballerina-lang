@@ -58,6 +58,7 @@ import org.wso2.ballerinalang.compiler.tree.expressions.BLangDynamicArgExpr;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangElvisExpr;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangErrorConstructorExpr;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangErrorVarRef;
+import org.wso2.ballerinalang.compiler.tree.expressions.BLangExtendedXMLNavigationAccess;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangFieldBasedAccess;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangGroupExpr;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangIgnoreExpr;
@@ -1138,6 +1139,10 @@ public abstract class BLangNodeTransformer<T, R> {
     }
 
     public R transform(BLangXMLMethodCallStepExtend node, T data) {
+        return transformNode(node, data);
+    }
+
+    public R transform(BLangExtendedXMLNavigationAccess node, T data) {
         return transformNode(node, data);
     }
 }
