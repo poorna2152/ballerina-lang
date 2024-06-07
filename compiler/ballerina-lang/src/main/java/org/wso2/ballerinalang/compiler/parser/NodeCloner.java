@@ -2345,8 +2345,7 @@ public class NodeCloner extends BLangNodeVisitor {
                 source.pos,
                 clone(source.expr),
                 cloneList(source.filters),
-                source.navAccessType,
-                clone(source.childIndex));
+                source.navAccessType);
         source.cloneRef = clone;
     }
 
