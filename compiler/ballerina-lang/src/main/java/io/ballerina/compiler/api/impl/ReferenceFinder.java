@@ -1349,7 +1349,12 @@ public class ReferenceFinder extends BaseVisitor {
 
     @Override
     public void visit(BLangXMLMethodCallStepExtend xmlMethodCallStepExtend) {
-        find(xmlMethodCallStepExtend.invocation);
+        BLangInvocation invocation = xmlMethodCallStepExtend.invocation;
+        List<BLangExpression> argExprs = invocation.argExprs;
+        for (int i = 1; i < argExprs.size(); i++) {
+            find(argExprs.get(i));
+        }
+        addIfSameSymbol(invocation.symbol, invocation.name.pos);
     }
 
     @Override
@@ -1521,8 +1526,7 @@ public class ReferenceFinder extends BaseVisitor {
                 && this.targetSymbol.name.equals(symbol.name)
                 && this.targetSymbol.pkgID.equals(symbol.pkgID)
                 && this.targetSymbol.pos.equals(symbol.pos)
-                && (this.withDefinition || (symbol.getOrigin() != VIRTUAL && !symbol.pos.equals(location)))) {
-            this.referenceLocations.add(location);
+                && (this.withDefinition || (symbol.getOrigin() != VIRTUAL && !symbol.pos.equals(location)))) {this.referenceLocations.add(location);
             return true;
         }
         return false;

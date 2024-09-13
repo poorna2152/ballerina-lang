@@ -98,6 +98,7 @@ import org.wso2.ballerinalang.compiler.tree.expressions.BLangConstant;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangElvisExpr;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangErrorConstructorExpr;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangErrorVarRef;
+import org.wso2.ballerinalang.compiler.tree.expressions.BLangExpression;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangExtendedXMLNavigationAccess;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangFieldBasedAccess;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangGroupExpr;
@@ -2316,20 +2317,17 @@ public class NodeCloner extends BLangNodeVisitor {
 
     @Override
     public void visit(BLangXMLIndexedStepExtend source) {
-        BLangXMLIndexedStepExtend clone = new BLangXMLIndexedStepExtend(source.pos, source.indexExpr);
-        source.cloneRef = clone;
+        source.cloneRef = new BLangXMLIndexedStepExtend(source.pos, clone(source.indexExpr));
     }
 
     @Override
     public void visit(BLangXMLFilterStepExtend source) {
-        BLangXMLFilterStepExtend clone = new BLangXMLFilterStepExtend(source.pos, cloneList(source.filters));
-        source.cloneRef = clone;
+        source.cloneRef = new BLangXMLFilterStepExtend(source.pos, cloneList(source.filters));
     }
 
     @Override
     public void visit(BLangXMLMethodCallStepExtend source) {
-        BLangXMLMethodCallStepExtend clone = new BLangXMLMethodCallStepExtend(source.pos, clone(source.invocation));
-        source.cloneRef = clone;
+        source.cloneRef = new BLangXMLMethodCallStepExtend(source.pos, clone(source.invocation));
     }
 
     @Override
